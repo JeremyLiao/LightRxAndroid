@@ -1,61 +1,69 @@
-##MessageBus
-一个android平台的基于订阅-发布模式的消息框架，支持跨进程消息通信
+##LightRxAndroid
+- A Rx framework for android
 
-##MessageBus 3 Steps:
-* 1.注册接收消息的接口
+##Sample
 
-```java
-    @BroadcastAction(action = "com.action.message")
-    public void onMessageReceived(Intent intent) {
-        //
-    }
+- You can write the codes like this:
+
+
+```
+        Observable
+                .create(new Func1<String>() {
+                    @Override
+                    public String call() {
+                        String dat = "-1";
+                        Log.d(TAG, "create " + dat + " on thread: " + Thread.currentThread().getId());
+                        return dat;
+                    }
+                })
+                .subscribeOn(AndroidHandlers.ioThreadHandler())
+                .observeOn(AndroidHandlers.computeThreadHandler())
+                .map(new Func2<String, Integer>() {
+                    @Override
+                    public Integer call(String s) throws InterruptException {
+                        int ret = Integer.parseInt(s);
+                        Log.d(TAG, "map from " + s + " to " + ret + " on thread: " + Thread.currentThread().getId());
+                        if (ret < 0) {
+                            throw new InterruptException("input not right", ret);
+                        }
+                        return ret;
+                    }
+                })
+                .observeOn(AndroidHandlers.mainThreadHandler())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onCompleted(Integer integer) {
+                        Log.d(TAG, "onCompleted with data " + integer + " on thread: " + Thread.currentThread().getId());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError: " + e.toString() + " on thread: " + Thread.currentThread().getId());
+                    }
+                });
 ```
 
-* 2.订阅和退订
-<br>
-例如在Activity的onCreate中订阅，在onDestroy中取消订阅，注意订阅和取消订阅一定要配对出现
-<br>
-```java
-    protected void onCreate(Bundle savedInstanceState) {
-        MessageBus.getDefault().register(this, this);
-    }
-```
-<br>
-```java
-    protected void onDestroy() {
-        super.onDestroy();
-        MessageBus.getDefault().unregister(this);
-    }
-```
-
-* 3.发送消息
-<br>
-可以使用下面的代码或者直接发送一个广播
-<br>
-```java
- Intent intent = new Intent("com.action.message");
- intent.putExtra("data", "new message");
- MessageBus.getDefault().post(this, intent);
-```
-
-## Add MessageBus to your project
+## Add LightRxAndroid to your project
 <br>
 Please ensure that you are using the latest version by checking here
 <br>
 Gradle:
 <br>
 ```
-compile 'com.lhl:message-bus:0.0.1'
+compile 'com.lhl:light-rx-android:0.0.1'
 ```
 
-## Why use MessageBus
+Maven:
+```
+<dependency>
+  <groupId>com.lhl</groupId>
+  <artifactId>light-rx-android</artifactId>
+  <version>0.0.1</version>
+  <type>pom</type>
+</dependency>
+```
 
-- MessageBus是一个android平台的基于订阅-发布模式的消息框架，支持跨进程消息通信
+## Why use
 
-- 主要可以用来代替android的动态广播
-
-- 如果使用动态广播，我们的代码中会增加很多重复的注册动态广播，解注册广播的代码，这些重复的代码不仅写起来很烦，而且这些动态广播也降低了代码的可读性
-
-- MessageBus比EventBus好在哪：
-* 1.非常非常轻
-* 2.支持进程间通信，支持跨APP的通信。无论你在哪发的消息，我一定能收到
+- Simple
+- Light
