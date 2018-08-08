@@ -44,11 +44,14 @@
 ```
 
 ## Add LightRxAndroid to your project
-<br>
+
+
 Please ensure that you are using the latest version by checking here
-<br>
+
+
 Gradle:
-<br>
+
+
 ```
 compile 'com.lhl:light-rx-android:0.0.1'
 ```
