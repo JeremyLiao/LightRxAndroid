@@ -1,7 +1,7 @@
-##LightRxAndroid
+## LightRxAndroid
 - A Rx framework for android
 
-##Sample
+## Sample
 
 - You can write the codes like this:
 
